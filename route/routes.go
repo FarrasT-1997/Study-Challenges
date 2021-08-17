@@ -50,7 +50,7 @@ func New(e *echo.Echo) {
 	eJwt.POST("users/submit_soal", controller.SubmitQuestion)
 
 	//USER FEATURE EXERCISE
-	eJwt.POST("users/:user_id/soal/:kategori_materi_pelajaran_id/set_soal", controller.GenerateRandomQuestion)
+	eJwt.POST("users/:user_id/soal/:kategori_materi_pelajaran_id/:kesulitan", controller.GenerateRandomQuestion)
 	eJwt.GET("users/:user_id/soal/:set_soal_id", controller.ShowActiveQuestion)
 	eJwt.PUT("users/:user_id/soal/:set_soal_id/:nomor1/:nomor2/:nomor3/:nomor4/:nomor5".controller.AnswerQuestion)
 	eJwt.GET("users/:user_id/soal/:set_soal_id/score", controller.ShowScore)
