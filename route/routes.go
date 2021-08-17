@@ -14,13 +14,13 @@ func New(e *echo.Echo) {
 	e.POST("/users/login", controller.UserLogin)
 	e.POST("/admin/login", controller.AdminLogin)
 
-	//LOGOUT FOR USER AND ADMIN
-	e.PUT("/users/logout", controller.UserLogout)
-	e.PUT("/admin/logout", controller.AdminLogout)
-
 	//AUTHORIZATION JWT
 	eJwt := e.Group("/jwt")
 	eJwt.Use(middleware.JWT([]byte(constant.SECRET_JWT)))
+
+	//LOGOUT FOR USER AND ADMIN
+	eJwt.PUT("/users/:userId/logout", controller.UserLogout)
+	eJwt.PUT("/admin/:adminId/logout", controller.AdminLogout)
 
 	//USER PROFILE
 	eJwt.GET("/users/:id", controller.ShowUserProfile)
