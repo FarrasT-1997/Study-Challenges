@@ -2,8 +2,11 @@ package models
 
 import "gorm.io/gorm"
 
-type SetSoalDetail struct {
+type Set_soal_detail struct {
 	gorm.Model
-	SetSoalID uint
-	Soal      []Soal
+	Set_soalID   uint
+	SoalID       uint
+	Status       string `json:"status" form:"status"`
+	Poin         int    `json:"poin" form:"poin"`
+	Jawaban_user string `json:"jawaban-user" form:"jawaban-user"`
 }
