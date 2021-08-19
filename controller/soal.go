@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"SC/auth"
 	"SC/database"
 	"SC/models"
 	"net/http"
@@ -9,19 +8,30 @@ import (
 	"github.com/labstack/echo"
 )
 
-func Authorized(c echo.Context) (bool, models.User) {
-	userId, token := auth.ExtractTokenUserId(c)
-	userList, _ := database.GetOneUser(userId)
-
-	if userList.Token != token {
-		return false, userList
+func SubmitQuestionAdmin(c echo.Context) error {
+	submitSoal := models.Soal{}
+	submitSoal.Approval = "sudah"
+	c.Bind(&submitSoal)
+	soal, err := database.CreateQuestion(submitSoal)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "cannot insert data",
+		})
 	}
-	return true, userList
+	mapSoal := map[string]interface{}{
+		"Soal":      soal.ID,
+		"Pilihan A": user.Nama,
+		"Pilihan B": user.Email,
+		"Pilihan C": user.TotalPoin,
+		"Pilihan D": user.TotalPoin,
+		"Jawaban":   user.TotalPoin,
+		"Kesulitan": user.TotalPoin,
+		"Solusi":    user.TotalPoin,
+		"Approval":  user.Rank,
+		"Kategori":  user.Rank,
+	}
 }
 
 func SubmitQuestion(c echo.Context) error {
-	auth, userList := Authorized(c)
-	if auth == false {
-		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
-	}
+
 }
