@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"SC/auth"
 	"SC/database"
 	"SC/models"
 	"net/http"
@@ -38,6 +39,9 @@ func ShowAdminProfile(c echo.Context) error {
 			"message": "invalid id",
 		})
 	}
+	if err = AdminAuthorize(id, c); err != nil {
+		return err
+	}
 	admin, err := database.GetAdminid(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -63,6 +67,9 @@ func EditAdminProfile(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid id",
 		})
+	}
+	if err = AdminAuthorize(id, c); err != nil {
+		return err
 	}
 	admin := database.PutAdmin(id)
 	c.Bind(&admin)
@@ -103,6 +110,17 @@ func AdminLogin(c echo.Context) error {
 	})
 }
 
+// AUTHORIZATION ADMIN
+func AdminAuthorize(adminId int, c echo.Context) error {
+	adminAuth, err := database.GetAdminid(adminId)
+	loggedInAdminId, role := auth.ExtractTokenUserId(c)
+	if loggedInAdminId != adminId || adminAuth.Role != role || err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
+	}
+	return nil
+}
+
+//Admin logout with update/edit the token
 func AdminLogout(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("userId"))
 	if err != nil {
