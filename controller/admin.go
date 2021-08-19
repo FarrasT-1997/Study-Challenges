@@ -13,6 +13,7 @@ import (
 //post admin controller for admin signup
 func AdminSignup(c echo.Context) error {
 	admin := models.User{}
+	admin.Role = "admin"
 	c.Bind(&admin)
 	adminAdd, err := database.CreateAdmin(admin)
 	if err != nil {
