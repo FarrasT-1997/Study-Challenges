@@ -141,3 +141,41 @@ func ShowActiveQuestion(c echo.Context) error {
 		"data":    mapshowSoal,
 	})
 }
+
+func AnswerQuestion(c echo.Context) error {
+	userId, err1 := strconv.Atoi(c.Param("user_id"))
+	setSoalId, err2 := strconv.Atoi(c.Param("set_soal_id"))
+	if err1 != nil || err2 != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "invalid id",
+		})
+	}
+
+	if err := UserAuthorize(userId, c); err != nil {
+		return err
+	}
+
+	type jawaban struct {
+		Soal_1 string
+		Soal_2 string
+		Soal_3 string
+		Soal_4 string
+		Soal_5 string
+	}
+	var jawabanUser jawaban
+	c.Bind(&jawabanUser)
+
+	var jawabanUserMap = make(map[int]string)
+	jawabanUserMap[1] = jawabanUser.Soal_1
+	jawabanUserMap[2] = jawabanUser.Soal_2
+	jawabanUserMap[3] = jawabanUser.Soal_3
+	jawabanUserMap[4] = jawabanUser.Soal_4
+	jawabanUserMap[5] = jawabanUser.Soal_5
+	database.PutAnswer(setSoalId, jawabanUserMap)
+	totalScore, totalBenar, totalSalah, totalTerjawab, SoalId_salah := database.Scoring(setSoalId)
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Question Answered",
+		"data":    jawabanUser,
+	})
+}
