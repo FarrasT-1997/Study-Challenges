@@ -33,8 +33,6 @@ func InitPort() {
 
 func InitMigrate() {
 	DB.AutoMigrate(&models.User{})
-	DB.AutoMigrate(&models.Admin{})
-	DB.AutoMigrate(&models.Submit_soal{})
 	DB.AutoMigrate(&models.Set_soal{})
 	DB.AutoMigrate(&models.Set_soal_detail{})
 	DB.AutoMigrate(&models.Soal{})
