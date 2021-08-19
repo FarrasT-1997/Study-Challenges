@@ -5,8 +5,9 @@ import (
 	"SC/models"
 )
 
-func SubmitQuestion(soal models.Soal) {
+func CreateQuestion(soal models.Soal) (models.Soal, error) {
 	if err := config.DB.Save(&soal).Error; err != nil {
-		return
+		return soal, err
 	}
+	return soal, nil
 }

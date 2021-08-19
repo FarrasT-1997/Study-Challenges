@@ -10,7 +10,23 @@ import (
 
 func SubmitQuestionAdmin(c echo.Context) error {
 	submitSoal := models.Soal{}
-	submitSoal.Approval = "sudah"
+	submitSoal.Approval = "accept"
+	c.Bind(&submitSoal)
+	soal, err := database.CreateQuestion(submitSoal)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"message": "cannot insert data",
+		})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "new question added",
+		"data":    soal,
+	})
+}
+
+func SubmitQuestion(c echo.Context) error {
+	submitSoal := models.Soal{}
+	submitSoal.Approval = "not yet"
 	c.Bind(&submitSoal)
 	soal, err := database.CreateQuestion(submitSoal)
 	if err != nil {
@@ -20,18 +36,17 @@ func SubmitQuestionAdmin(c echo.Context) error {
 	}
 	mapSoal := map[string]interface{}{
 		"Soal":      soal.ID,
-		"Pilihan A": user.Nama,
-		"Pilihan B": user.Email,
-		"Pilihan C": user.TotalPoin,
-		"Pilihan D": user.TotalPoin,
-		"Jawaban":   user.TotalPoin,
-		"Kesulitan": user.TotalPoin,
-		"Solusi":    user.TotalPoin,
-		"Approval":  user.Rank,
-		"Kategori":  user.Rank,
+		"Pilihan A": soal.PilihanA,
+		"Pilihan B": soal.PilihanB,
+		"Pilihan C": soal.PilihanC,
+		"Pilihan D": soal.PilihanD,
+		"Jawaban":   soal.Jawaban,
+		"Kesulitan": soal.KesulitanID,
+		"Solusi":    soal.Solusi,
+		"Kategori":  soal.CategoryID,
 	}
-}
-
-func SubmitQuestion(c echo.Context) error {
-
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "new question added",
+		"data":    mapSoal,
+	})
 }
