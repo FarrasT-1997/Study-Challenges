@@ -24,6 +24,19 @@ func GetOneSoal(id int) models.Soal {
 	return soal
 }
 
+func RandomId(soalCategory_id, level uint) []models.Soal {
+	var soal []models.Soal
+	config.DB.Raw("SELECT id FROM soals WHERE kesulitan_id = ? AND category_id = ? AND approval = 'accept' ORDER BY rand() LIMIT 5", level, soalCategory_id).Scan(&soal)
+	return soal
+}
+
 func InputSetSoalDetail(setSoalDetail models.Set_soal_detail) {
 	config.DB.Save(&setSoalDetail)
+}
+
+func ShowActiveSoal(setSoalId int) []models.Soal {
+	var soalDetail []models.Set_soal_detail
+	var soal []models.Soal
+	config.DB.Raw("select soals.id, soal_pertanyaan, pilihan_a, pilihan_b, pilihan_c, pilihan_d from soals inner join set_soal_details on set_soal_details.soal_id = soals.id where set_soal_details.set_soal_id = ?", setSoalId).Scan(&soal).Scan(&soalDetail)
+	return soal
 }

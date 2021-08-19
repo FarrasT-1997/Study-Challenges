@@ -3,8 +3,6 @@ package controller
 import (
 	"SC/database"
 	"SC/models"
-	"fmt"
-	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -90,35 +88,56 @@ func levelAndCategoryIDConvert(materi, level uint) (string, string) {
 }
 
 func randomizeSoal(soal_id, soalCategory_id, level uint, c echo.Context) {
-	var recordedRandom = []int{}
-	sameRandom := true
-	same := false
-	min := 1
-	max := database.LastQuestion()
-	var randomId int
-	var selectedSoal models.Soal
-	for i := 1; i <= 5; i++ {
-		randomId = min + rand.Intn(max-min+1)
-		fmt.Println(randomId)
-		for j := 0; j < len(recordedRandom); j++ {
-			if recordedRandom[j] == randomId {
-				same = true
-				j = len(recordedRandom)
-			}
-		}
-		recordedRandom = append(recordedRandom, randomId)
-		selectedSoal = database.GetOneSoal(randomId)
-		if sameRandom == same || selectedSoal.Approval != "accept" || selectedSoal.CategoryID != soalCategory_id || selectedSoal.KesulitanID != level {
-			i--
-			continue
-		}
+	random := database.RandomId(soalCategory_id, level)
+	for i := 0; i < 5; i++ {
 		newSetSoalDetail := models.Set_soal_detail{
 			Set_soalID:   soal_id,
-			SoalID:       selectedSoal.ID,
+			SoalID:       random[i].ID,
 			Status:       "not answered",
 			Poin:         0,
 			Jawaban_user: "pass",
 		}
 		database.InputSetSoalDetail(newSetSoalDetail)
 	}
+}
+
+func ShowActiveQuestion(c echo.Context) error {
+	userId, err1 := strconv.Atoi(c.Param("user_id"))
+	setSoalId, err2 := strconv.Atoi(c.Param("set_soal_id"))
+	if err1 != nil || err2 != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "invalid id",
+		})
+	}
+
+	if err := UserAuthorize(userId, c); err != nil {
+		return err
+	}
+
+	showSoal := database.ShowActiveSoal(setSoalId)
+	type arraySoal struct {
+		Soal      string
+		Soal_id   uint
+		Pilihan_A string
+		Pilihan_B string
+		Pilihan_C string
+		Pilihan_D string
+	}
+	var mapshowSoal []arraySoal
+
+	for i := 0; i < 5; i++ {
+		newArray := arraySoal{
+			Soal:      showSoal[i].Soal_pertanyaan,
+			Soal_id:   showSoal[i].ID,
+			Pilihan_A: showSoal[i].PilihanA,
+			Pilihan_B: showSoal[i].PilihanB,
+			Pilihan_C: showSoal[i].PilihanC,
+			Pilihan_D: showSoal[i].PilihanD,
+		}
+		mapshowSoal = append(mapshowSoal, newArray)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "All questions show successfully",
+		"data":    mapshowSoal,
+	})
 }

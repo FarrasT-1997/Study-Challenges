@@ -11,7 +11,7 @@ import (
 func New(e *echo.Echo) {
 	// SIGNUP FOR USER AND ADMIN
 	e.POST("/users/signup", controller.UserSignup)
-	// e.POST("/admin/signup", controller.AdminSignup)
+	e.POST("/admin/signup", controller.AdminSignup)
 
 	//LOGIN FOR USER AND ADMIN
 	e.POST("/users/login", controller.UserLogin)
