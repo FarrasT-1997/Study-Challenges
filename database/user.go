@@ -52,3 +52,12 @@ func EditUser(user models.User) (models.User, error) {
 	}
 	return user, nil
 }
+
+//Get top 10 users order by poin
+func Leaderboards() ([]models.User, error) {
+	var users []models.User
+	if err := config.DB.Order("total_poin desc").Limit(10).Where("role = ?", "user").Find(&users).Error; err != nil {
+		return users, err
+	}
+	return users, nil
+}
