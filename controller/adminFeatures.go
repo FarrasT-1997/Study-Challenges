@@ -116,9 +116,44 @@ func GetQuestionByCategory(c echo.Context) error {
 		})
 	}
 
+	//-------------------------
+
+	type arrayOfSoal struct {
+		ID              uint
+		Soal_pertanyaan string
+		Pilihan_A       string
+		Pilihan_B       string
+		Pilihan_C       string
+		Pilihan_D       string
+		Jawaban         string
+		KesulitanID     uint
+		Solusi          string
+		Approval        string
+		CategoryId      uint
+	}
+	var mapArraySoal []arrayOfSoal
+	//fmt.Println(soalByCategoryList[0].PilihanA)
+	for i := 0; i < len(soalByCategoryList); i++ {
+		newArray := arrayOfSoal{
+			ID:              soalByCategoryList[i].ID,
+			Soal_pertanyaan: soalByCategoryList[i].Soal_pertanyaan,
+			Pilihan_A:       soalByCategoryList[i].PilihanA,
+			Pilihan_B:       soalByCategoryList[i].PilihanB,
+			Pilihan_C:       soalByCategoryList[i].PilihanC,
+			Pilihan_D:       soalByCategoryList[i].PilihanD,
+			Jawaban:         soalByCategoryList[i].Jawaban,
+			KesulitanID:     soalByCategoryList[i].KesulitanID,
+			Solusi:          soalByCategoryList[i].Solusi,
+			Approval:        soalByCategoryList[i].Approval,
+			CategoryId:      soalByCategoryList[i].CategoryID,
+		}
+		//fmt.Println(newArray)
+		mapArraySoal = append(mapArraySoal, newArray)
+
+	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success",
-		"data":    soalByCategoryList,
+		"data":    mapArraySoal,
 	})
 
 }
@@ -176,21 +211,21 @@ func DeleteQuestion(c echo.Context) error {
 		})
 	}
 	//------------------------
-	soalToDelete, err := database.DeleteOneSoalSpecifiedId(soalId)
-	if err != nil {
+	_, err1 := database.DeleteOneSoalSpecifiedId(soalId)
+	if err1 != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "cannot delete soal",
 		})
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success",
-		"data":    soalToDelete,
+		"message": "Deleted Problem",
 	})
 
 }
 
 //ADMIN FEATURES: SHOW ALL PROBLEM THAT HAS NOT BEEN REVIEWED -- BY CATEGORY
 func ShowSubmittedQuestion(c echo.Context) error {
+	//---------------------------------------------------------
 	//---------------------------------------------------------
 	auth := AuthorizedAdmin(c)
 	if auth == false {
@@ -208,8 +243,46 @@ func ShowSubmittedQuestion(c echo.Context) error {
 	if err := config.DB.Where(map[string]interface{}{"category_id": categoryId, "approval": "not yet"}).Find(&soal).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "Cannot find the problem that needs approval")
 	}
+
+	//------------------------------------------------
+
+	type arrayOfSoal struct {
+		ID              uint
+		Soal_pertanyaan string
+		Pilihan_A       string
+		Pilihan_B       string
+		Pilihan_C       string
+		Pilihan_D       string
+		Jawaban         string
+		KesulitanID     uint
+		Solusi          string
+		Approval        string
+		CategoryId      uint
+	}
+	var mapArraySoal []arrayOfSoal
+	//fmt.Println(soalByCategoryList[0].PilihanA)
+	for i := 0; i < len(soal); i++ {
+		newArray := arrayOfSoal{
+			ID:              soal[i].ID,
+			Soal_pertanyaan: soal[i].Soal_pertanyaan,
+			Pilihan_A:       soal[i].PilihanA,
+			Pilihan_B:       soal[i].PilihanB,
+			Pilihan_C:       soal[i].PilihanC,
+			Pilihan_D:       soal[i].PilihanD,
+			Jawaban:         soal[i].Jawaban,
+			KesulitanID:     soal[i].KesulitanID,
+			Solusi:          soal[i].Solusi,
+			Approval:        soal[i].Approval,
+			CategoryId:      soal[i].CategoryID,
+		}
+		//fmt.Println(newArray)
+		mapArraySoal = append(mapArraySoal, newArray)
+
+	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Success",
-		"Data":    soal,
+		"message": "success",
+		"data":    mapArraySoal,
 	})
+
+	//------------------------------------------------
 }
