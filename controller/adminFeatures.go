@@ -70,14 +70,13 @@ func EditSubmitQuestion(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "cannot find soal based on id")
 	}
 	c.Bind(&oneProblem)
-	approvalStatus, err := database.EditSoal(oneProblem)
-	if err != nil {
+	_, err1 := database.EditSoal(oneProblem)
+	if err1 != nil {
 		return c.JSON(http.StatusBadRequest, "Cannot Edit Status Approval")
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Success",
-		"Data":    approvalStatus,
+		"message": "Updates Approval",
 	})
 }
 
