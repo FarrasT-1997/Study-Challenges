@@ -150,3 +150,24 @@ func EditUserProfile(c echo.Context) error {
 		"data":    mapUser,
 	})
 }
+
+//Get top 10 player in leader board
+func ShowLeaderboards(c echo.Context) error {
+	users, err := database.Leaderboards()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	var usersedit []map[string]interface{}
+	for i := 0; i < len(users); i++ {
+		mapUser := map[string]interface{}{
+			"Name":       users[i].Nama,
+			"Total Poin": users[i].TotalPoin,
+			"Rank":       users[i].Rank,
+		}
+		usersedit = append(usersedit, mapUser)
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message":      "success get top 10 player in Leader Board",
+		"Leader Board": usersedit,
+	})
+}
