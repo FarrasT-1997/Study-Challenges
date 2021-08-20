@@ -49,7 +49,7 @@ func AdminLoginDB(email, password string) (models.User, error) {
 	if err = config.DB.Where("email = ? AND password = ?", email, password).First(&admin).Error; err != nil {
 		return admin, err
 	}
-	admin.Token, err = auth.CreateToken(int(admin.ID))
+	admin.Token, err = auth.CreateAdminToken(int(admin.ID))
 	if err != nil {
 		return admin, err
 	}
