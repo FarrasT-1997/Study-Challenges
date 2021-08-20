@@ -18,7 +18,7 @@ func New(e *echo.Echo) {
 	e.POST("/admin/login", controller.AdminLogin)
 
 	//AUTHORIZATION JWT
-	eJwt := e.Group("/jwt")
+	eJwt := e.Group("")
 	eJwt.Use(middleware.JWT([]byte(constant.SECRET_JWT)))
 
 	//LOGOUT FOR USER AND ADMIN
@@ -46,7 +46,7 @@ func New(e *echo.Echo) {
 	eJwt.PUT("/admin/submit_soal/approval/:id", controller.EditSubmitQuestion)                     //APPROVAL THE QUESTION (APPROVED OR REJECT)
 
 	//USER FEATURE SUBMIT NEW QUESTION
-	eJwt.POST("users/submit_soal", controller.SubmitQuestion)
+	eJwt.POST("/users/submit_soal", controller.SubmitQuestion)
 
 	//USER FEATURE EXERCISE
 	eJwt.POST("/users/:user_id/soal", controller.GenerateRandomQuestion)

@@ -70,7 +70,7 @@ func EditSubmitQuestion(c echo.Context) error {
 	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
-	soalId, err := strconv.Atoi(c.Param("soalId"))
+	soalId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid problem id",

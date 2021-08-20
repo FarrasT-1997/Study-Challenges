@@ -109,7 +109,12 @@ func ShowActiveQuestion(c echo.Context) error {
 			"message": "invalid id",
 		})
 	}
-
+	setSoal := database.ShowSetSoal(setSoalId)
+	if setSoal.UserID != uint(userId) || setSoal.Status == "answered" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "invalid set soal id",
+		})
+	}
 	if err := UserAuthorize(userId, c); err != nil {
 		return err
 	}
@@ -150,7 +155,12 @@ func AnswerQuestion(c echo.Context) error {
 			"message": "invalid id",
 		})
 	}
-
+	setSoal := database.ShowSetSoal(setSoalId)
+	if setSoal.UserID != uint(userId) || setSoal.Status == "answered" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "invalid set soal id",
+		})
+	}
 	if err := UserAuthorize(userId, c); err != nil {
 		return err
 	}
@@ -195,7 +205,12 @@ func ShowSolution(c echo.Context) error {
 			"message": "invalid id",
 		})
 	}
-
+	setSoal := database.ShowSetSoal(setSoalId)
+	if setSoal.UserID != uint(userId) {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "invalid set soal id",
+		})
+	}
 	if err := UserAuthorize(userId, c); err != nil {
 		return err
 	}
