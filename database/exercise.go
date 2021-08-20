@@ -3,6 +3,7 @@ package database
 import (
 	"SC/config"
 	"SC/models"
+	"fmt"
 )
 
 func CreateSetSoal(setSoal models.Set_soal) (models.Set_soal, error) {
@@ -51,10 +52,9 @@ func PutAnswer(setSoalId int, jawabanUser map[int]string) {
 	config.DB.Save(&soalDetail)
 }
 
-func Scoring(setSoalId int) (int, int, int, int, []int) {
+func Scoring(setSoalId int) (int, []int) {
 	var soalDetail []models.Set_soal_detail
 	var set_soal models.Set_soal
-	var soal models.Soal
 
 	var totalScore int = 0
 	var totalBenar int = 0
@@ -66,6 +66,7 @@ func Scoring(setSoalId int) (int, int, int, int, []int) {
 	config.DB.Where("id=?", setSoalId).Find(&set_soal)
 
 	for i := 0; i < 5; i++ {
+		var soal models.Soal
 		config.DB.Where("id=?", soalDetail[i].SoalID).Find(&soal)
 		if soal.Jawaban == soalDetail[i].Jawaban_user {
 			totalBenar++
@@ -88,6 +89,38 @@ func Scoring(setSoalId int) (int, int, int, int, []int) {
 		}
 		totalScore += soalDetail[i].Poin
 	}
+
+	set_soal.TotalBenar = totalBenar
+	set_soal.TotalSalah = totalSalah
+	set_soal.TotalTerjawab = totalTerjawab
+	set_soal.Status = "answered"
+
+	config.DB.Save(&set_soal)
 	config.DB.Save(&soalDetail)
-	return totalScore, totalBenar, totalSalah, totalTerjawab, SoalId_salah
+	return totalScore, SoalId_salah
+}
+
+func UpdateUser(userId, totalScore int) {
+	var user models.User
+	config.DB.Find(&user, "id=?", userId)
+	user.TotalPoin += totalScore
+
+	if user.TotalPoin < 21 {
+		user.Rank = "Bronze"
+	}
+	if user.TotalPoin > 20 && user.TotalPoin < 41 {
+		user.Rank = "Silver"
+	}
+	if user.TotalPoin > 40 {
+		user.Rank = "Gold"
+	}
+	config.DB.Save(&user)
+}
+
+func GetSolution(setSoalId int) []models.Soal {
+	var soal []models.Soal
+
+	config.DB.Raw("select soals.id, soals.solusi from soals inner join set_soal_details on set_soal_details.soal_id = soals.id where set_soal_details.set_soal_id = ?", setSoalId).Scan(&soal)
+	fmt.Println(soal)
+	return soal
 }

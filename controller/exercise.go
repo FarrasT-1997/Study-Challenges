@@ -172,10 +172,45 @@ func AnswerQuestion(c echo.Context) error {
 	jawabanUserMap[4] = jawabanUser.Soal_4
 	jawabanUserMap[5] = jawabanUser.Soal_5
 	database.PutAnswer(setSoalId, jawabanUserMap)
-	totalScore, totalBenar, totalSalah, totalTerjawab, SoalId_salah := database.Scoring(setSoalId)
+	totalScore, SoalId_salah := database.Scoring(setSoalId)
+
+	database.UpdateUser(userId, totalScore)
+
+	mapResult := map[string]interface{}{
+		"Total Score": totalScore,
+		"Soal Salah":  SoalId_salah,
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Question Answered",
-		"data":    jawabanUser,
+		"data":    mapResult,
+	})
+}
+
+func ShowSolution(c echo.Context) error {
+	userId, err1 := strconv.Atoi(c.Param("user_id"))
+	setSoalId, err2 := strconv.Atoi(c.Param("set_soal_id"))
+	if err1 != nil || err2 != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "invalid id",
+		})
+	}
+
+	if err := UserAuthorize(userId, c); err != nil {
+		return err
+	}
+
+	solution := database.GetSolution(setSoalId)
+	mapSolution := map[string]string{
+		"Solusi 1": solution[0].Solusi,
+		"Solusi 2": solution[1].Solusi,
+		"Solusi 3": solution[2].Solusi,
+		"Solusi 4": solution[3].Solusi,
+		"Solusi 5": solution[4].Solusi,
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Here is the solutions",
+		"data":    mapSolution,
 	})
 }
