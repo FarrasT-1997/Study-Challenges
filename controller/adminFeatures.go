@@ -12,32 +12,36 @@ import (
 )
 
 //AUTHORIZED AND ROLE AS ADMIN
-func AuthorizedAdmin(c echo.Context) (bool, models.User) {
-	loggedInAdminId, role := auth.ExtractTokenUserId(c)
-	adminList, _ := database.GetAdminid(loggedInAdminId)
+func AuthorizedAdmin(c echo.Context) bool {
+	_, role := auth.ExtractTokenUserId(c)
+	//adminList, err := database.GetAdminid(loggedInAdminId)
 
-	if loggedInAdminId != int(adminList.ID) || role != "admin" {
-		return false, adminList
+	if role != "admin" {
+		return false
 	}
-	return true, adminList
+	return true
 }
 
 //ADMIN FEATURES: EDIT QUESTION
 func EditQuestion(c echo.Context) error {
-	auth, adminList := AuthorizedAdmin(c)
-	if auth == false || adminList.Role != "admin" {
+	//---------------------------
+	auth := AuthorizedAdmin(c)
+	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
-	soalId, err := strconv.Atoi(c.Param("soalId"))
-	if err != nil {
+	//-------------------------
+	soalId, err2 := strconv.Atoi(c.Param("soalId"))
+	if err2 != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "invalid problem id",
+			"message": "invalid id",
 		})
 	}
+	//---------------------------------------------------------
 	oneProblem, err := database.GetOneQuestionById(soalId)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "cannot find soal based on id")
 	}
+	c.Bind(&oneProblem)
 	editedSoal, err := database.EditSoal(oneProblem)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Cannot edit soal")
@@ -50,27 +54,25 @@ func EditQuestion(c echo.Context) error {
 
 //ADMIN FEATURES: UPDATING APPROVAL STATUS (ACCEPT, REJECT, AND NOT YET)
 func EditSubmitQuestion(c echo.Context) error {
-	auth, adminList := AuthorizedAdmin(c)
-	if auth == false || adminList.Role != "admin" {
+	auth := AuthorizedAdmin(c)
+	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
-	soalId, err := strconv.Atoi(c.Param("id"))
+	soalId, err := strconv.Atoi(c.Param("soalId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid problem id",
 		})
 	}
+
 	oneProblem, err := database.GetOneQuestionById(soalId)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Cannot find data",
-		})
+		return c.JSON(http.StatusBadRequest, "cannot find soal based on id")
 	}
-	approvalStatus, err := database.EditStatusApproval(oneProblem)
+	c.Bind(&oneProblem)
+	approvalStatus, err := database.EditSoal(oneProblem)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": "Cannot Change Status Approval",
-		})
+		return c.JSON(http.StatusBadRequest, "Cannot Edit Status Approval")
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
@@ -81,22 +83,26 @@ func EditSubmitQuestion(c echo.Context) error {
 
 //ADMIN FEATURES: GET ALL QUESTION BASED ON CATEGORY
 func GetQuestionByCategory(c echo.Context) error {
-	auth, adminList := AuthorizedAdmin(c)
-	if auth == false || adminList.Role != "admin" {
+	//---------------------------------------------------------
+	auth := AuthorizedAdmin(c)
+	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
+	//---------------------------------------------------------
 	categoryId, err := strconv.Atoi(c.Param("MataPelajaranId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid category id",
 		})
 	}
+
 	soalByCategoryList, err := database.GetAllSoalInSpecifiedCategory(categoryId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "cannot find problem based on the category id",
 		})
 	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success",
 		"data":    soalByCategoryList,
@@ -106,8 +112,8 @@ func GetQuestionByCategory(c echo.Context) error {
 
 //ADMIN FEATURES: GET QUESTION BASED ON ID
 func GetQuestionById(c echo.Context) error {
-	auth, adminList := AuthorizedAdmin(c)
-	if auth == false || adminList.Role != "admin" {
+	auth := AuthorizedAdmin(c)
+	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
 	soalId, err := strconv.Atoi(c.Param("soalId"))
@@ -122,25 +128,42 @@ func GetQuestionById(c echo.Context) error {
 			"message": "Cannot find the problem",
 		})
 	}
+	mapQuestion := map[string]interface{}{
+		"ID":              soal.ID,
+		"Soal_pertanyaan": soal.Soal_pertanyaan,
+		"PilihanA":        soal.PilihanA,
+		"PilihanB":        soal.PilihanB,
+		"PilihanC":        soal.PilihanC,
+		"PilihanD":        soal.PilihanD,
+		"Jawaban":         soal.Jawaban,
+		"KesulitanID":     soal.KesulitanID,
+		"Solusi":          soal.Solusi,
+		"Approval":        soal.Approval,
+		"CategoryID":      soal.CategoryID,
+	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success",
-		"data":    soal,
+		"data":    mapQuestion,
 	})
 }
 
 //ADMIN FEATURES: DELETE QUESTION BASED ON ID
 func DeleteQuestion(c echo.Context) error {
-	auth, adminList := AuthorizedAdmin(c)
-	if auth == false || adminList.Role != "admin" {
+	//---------------------------------------------------------
+
+	//---------------------------------------------------------
+	auth := AuthorizedAdmin(c)
+	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
-	id, err := strconv.Atoi(c.Param("soalId"))
+	soalId, err := strconv.Atoi(c.Param("soalId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid id",
 		})
 	}
-	soalToDelete, err := database.DeleteOneSoalSpecifiedId(id)
+	//------------------------
+	soalToDelete, err := database.DeleteOneSoalSpecifiedId(soalId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "cannot delete soal",
@@ -155,27 +178,25 @@ func DeleteQuestion(c echo.Context) error {
 
 //ADMIN FEATURES: SHOW ALL PROBLEM THAT HAS NOT BEEN REVIEWED -- BY CATEGORY
 func ShowSubmittedQuestion(c echo.Context) error {
-	auth, adminList := AuthorizedAdmin(c)
-	if auth == false || adminList.Role != "admin" {
+	//---------------------------------------------------------
+	auth := AuthorizedAdmin(c)
+	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
-	categoryId, err := strconv.Atoi("kategori_materi_pelajaran_id")
+	categoryId, err := strconv.Atoi(c.Param("kategori_materi_pelajaran_id"))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "cannot use the id",
 		})
 	}
-	soalByCategoryList, err := database.GetAllSoalInSpecifiedCategory(categoryId)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "cannot find problem based on the category id",
-		})
-	}
-	if err := config.DB.Find(&soalByCategoryList, "approval=?", "not yet").Error; err != nil {
+	//---------------------------------------------------------
+
+	var soal []models.Soal
+	if err := config.DB.Where(map[string]interface{}{"category_id": categoryId, "approval": "not_yet"}).Find(&soal).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "Cannot find the problem that needs approval")
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Success",
-		"Data":    soalByCategoryList,
+		"Data":    soal,
 	})
 }

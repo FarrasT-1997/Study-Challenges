@@ -5,13 +5,9 @@ import (
 	"SC/models"
 )
 
-func GetAllSoalInSpecifiedCategory(idcategory int) (interface{}, error) {
-	var category models.Category
-	if err := config.DB.Where("id=?", idcategory).First(&category).Error; err != nil {
-		return nil, err
-	}
+func GetAllSoalInSpecifiedCategory(idcategory int) ([]models.Soal, error) {
 	var soal []models.Soal
-	if err := config.DB.Find(&soal, "category_id=?", category.ID).Error; err != nil {
+	if err := config.DB.Find(&soal, "category_id=?", idcategory).Error; err != nil {
 		return nil, err
 	}
 
@@ -40,7 +36,7 @@ func GetOneQuestionById(soalId int) (models.Soal, error) {
 }
 
 func EditStatusApproval(soal models.Soal) (interface{}, error) {
-	if err := config.DB.Save(&soal.Approval).Error; err != nil {
+	if err := config.DB.Save(&soal).Error; err != nil {
 		return nil, err
 	}
 	return soal, nil
