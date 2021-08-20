@@ -42,9 +42,9 @@ func EditStatusApproval(soal models.Soal) (interface{}, error) {
 	return soal, nil
 }
 
-func EditSoal(soal models.Soal) (interface{}, error) {
+func EditSoal(soal models.Soal) (models.Soal, error) {
 	if err := config.DB.Save(&soal).Error; err != nil {
-		return nil, err
+		return soal, err
 	}
 	return soal, nil
 }

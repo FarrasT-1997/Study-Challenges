@@ -46,9 +46,23 @@ func EditQuestion(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Cannot edit soal")
 	}
+	mapQuestion := map[string]interface{}{
+		"ID":              editedSoal.ID,
+		"Soal_pertanyaan": editedSoal.Soal_pertanyaan,
+		"PilihanA":        editedSoal.PilihanA,
+		"PilihanB":        editedSoal.PilihanB,
+		"PilihanC":        editedSoal.PilihanC,
+		"PilihanD":        editedSoal.PilihanD,
+		"Jawaban":         editedSoal.Jawaban,
+		"KesulitanID":     editedSoal.KesulitanID,
+		"Solusi":          editedSoal.Solusi,
+		"Approval":        editedSoal.Approval,
+		"CategoryID":      editedSoal.CategoryID,
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "success",
-		"Data":    editedSoal,
+		"message": "Updated Problem",
+		"Data":    mapQuestion,
 	})
 }
 
