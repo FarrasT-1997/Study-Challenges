@@ -3,7 +3,6 @@ package database
 import (
 	"SC/config"
 	"SC/models"
-	"fmt"
 )
 
 func CreateSetSoal(setSoal models.Set_soal) (models.Set_soal, error) {
@@ -33,6 +32,12 @@ func RandomId(soalCategory_id, level uint) []models.Soal {
 
 func InputSetSoalDetail(setSoalDetail models.Set_soal_detail) {
 	config.DB.Save(&setSoalDetail)
+}
+
+func ShowSetSoal(set_soal_id int) models.Set_soal {
+	var set_soal models.Set_soal
+	config.DB.Where("id=?", set_soal_id).Find(&set_soal)
+	return set_soal
 }
 
 func ShowActiveSoal(setSoalId int) []models.Soal {
@@ -121,6 +126,5 @@ func GetSolution(setSoalId int) []models.Soal {
 	var soal []models.Soal
 
 	config.DB.Raw("select soals.id, soals.solusi from soals inner join set_soal_details on set_soal_details.soal_id = soals.id where set_soal_details.set_soal_id = ?", setSoalId).Scan(&soal)
-	fmt.Println(soal)
 	return soal
 }

@@ -115,7 +115,7 @@ func AdminLogin(c echo.Context) error {
 func AdminAuthorize(adminId int, c echo.Context) error {
 	adminAuth, err := database.GetAdminid(adminId)
 	loggedInAdminId, role := auth.ExtractTokenUserId(c)
-	if loggedInAdminId != adminId || adminAuth.Role != role || err != nil {
+	if loggedInAdminId != adminId || adminAuth.Role != role || err != nil || adminAuth.Role != "admin" {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
 	return nil
@@ -123,7 +123,7 @@ func AdminAuthorize(adminId int, c echo.Context) error {
 
 //Admin logout with update/edit the token
 func AdminLogout(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("userId"))
+	id, err := strconv.Atoi(c.Param("adminId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid id",

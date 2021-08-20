@@ -9,6 +9,10 @@ import (
 )
 
 func SubmitQuestionAdmin(c echo.Context) error {
+	auth := AuthorizedAdmin(c)
+	if auth == false {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
+	}
 	submitSoal := models.Soal{}
 	submitSoal.Approval = "accept"
 	c.Bind(&submitSoal)

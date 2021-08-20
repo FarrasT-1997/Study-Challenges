@@ -60,7 +60,7 @@ func UserLogin(c echo.Context) error {
 func UserAuthorize(userId int, c echo.Context) error {
 	userAuth, err := database.GetOneUser(userId)
 	loggedInUserId, role := auth.ExtractTokenUserId(c)
-	if loggedInUserId != userId || userAuth.Role != role || err != nil {
+	if loggedInUserId != userId || userAuth.Role != role || err != nil || userAuth.Role != "user" {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
 	return nil
@@ -103,6 +103,9 @@ func UserLogout(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid id",
 		})
+	}
+	if err = UserAuthorize(id, c); err != nil {
+		return err
 	}
 	logout, err := database.GetOneUser(id)
 	logout.Token = ""
