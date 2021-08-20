@@ -76,7 +76,7 @@ func EditSubmitQuestion(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Updates Approval",
+		"message": "Updated Approval",
 	})
 }
 
