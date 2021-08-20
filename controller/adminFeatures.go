@@ -14,7 +14,6 @@ import (
 //AUTHORIZED AND ROLE AS ADMIN
 func AuthorizedAdmin(c echo.Context) bool {
 	_, role := auth.ExtractTokenUserId(c)
-	//adminList, err := database.GetAdminid(loggedInAdminId)
 
 	if role != "admin" {
 		return false
@@ -24,19 +23,18 @@ func AuthorizedAdmin(c echo.Context) bool {
 
 //ADMIN FEATURES: EDIT QUESTION
 func EditQuestion(c echo.Context) error {
-	//---------------------------
 	auth := AuthorizedAdmin(c)
 	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
-	//-------------------------
+
 	soalId, err2 := strconv.Atoi(c.Param("soalId"))
 	if err2 != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "invalid id",
 		})
 	}
-	//---------------------------------------------------------
+
 	oneProblem, err := database.GetOneQuestionById(soalId)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "cannot find soal based on id")
@@ -96,12 +94,11 @@ func EditSubmitQuestion(c echo.Context) error {
 
 //ADMIN FEATURES: GET ALL QUESTION BASED ON CATEGORY
 func GetQuestionByCategory(c echo.Context) error {
-	//---------------------------------------------------------
 	auth := AuthorizedAdmin(c)
 	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
 	}
-	//---------------------------------------------------------
+
 	categoryId, err := strconv.Atoi(c.Param("MataPelajaranId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
@@ -115,8 +112,6 @@ func GetQuestionByCategory(c echo.Context) error {
 			"message": "cannot find problem based on the category id",
 		})
 	}
-
-	//-------------------------
 
 	type arrayOfSoal struct {
 		ID              uint
@@ -132,7 +127,7 @@ func GetQuestionByCategory(c echo.Context) error {
 		CategoryId      uint
 	}
 	var mapArraySoal []arrayOfSoal
-	//fmt.Println(soalByCategoryList[0].PilihanA)
+
 	for i := 0; i < len(soalByCategoryList); i++ {
 		newArray := arrayOfSoal{
 			ID:              soalByCategoryList[i].ID,
@@ -147,9 +142,8 @@ func GetQuestionByCategory(c echo.Context) error {
 			Approval:        soalByCategoryList[i].Approval,
 			CategoryId:      soalByCategoryList[i].CategoryID,
 		}
-		//fmt.Println(newArray)
-		mapArraySoal = append(mapArraySoal, newArray)
 
+		mapArraySoal = append(mapArraySoal, newArray)
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success",
@@ -197,9 +191,6 @@ func GetQuestionById(c echo.Context) error {
 
 //ADMIN FEATURES: DELETE QUESTION BASED ON ID
 func DeleteQuestion(c echo.Context) error {
-	//---------------------------------------------------------
-
-	//---------------------------------------------------------
 	auth := AuthorizedAdmin(c)
 	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
@@ -210,7 +201,6 @@ func DeleteQuestion(c echo.Context) error {
 			"message": "invalid id",
 		})
 	}
-	//------------------------
 	_, err1 := database.DeleteOneSoalSpecifiedId(soalId)
 	if err1 != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -225,8 +215,6 @@ func DeleteQuestion(c echo.Context) error {
 
 //ADMIN FEATURES: SHOW ALL PROBLEM THAT HAS NOT BEEN REVIEWED -- BY CATEGORY
 func ShowSubmittedQuestion(c echo.Context) error {
-	//---------------------------------------------------------
-	//---------------------------------------------------------
 	auth := AuthorizedAdmin(c)
 	if auth == false {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Cannot access this account")
@@ -237,14 +225,11 @@ func ShowSubmittedQuestion(c echo.Context) error {
 			"message": "cannot use the id",
 		})
 	}
-	//---------------------------------------------------------
 
 	var soal []models.Soal
 	if err := config.DB.Where(map[string]interface{}{"category_id": categoryId, "approval": "not yet"}).Find(&soal).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "Cannot find the problem that needs approval")
 	}
-
-	//------------------------------------------------
 
 	type arrayOfSoal struct {
 		ID              uint
@@ -260,7 +245,7 @@ func ShowSubmittedQuestion(c echo.Context) error {
 		CategoryId      uint
 	}
 	var mapArraySoal []arrayOfSoal
-	//fmt.Println(soalByCategoryList[0].PilihanA)
+
 	for i := 0; i < len(soal); i++ {
 		newArray := arrayOfSoal{
 			ID:              soal[i].ID,
@@ -275,7 +260,7 @@ func ShowSubmittedQuestion(c echo.Context) error {
 			Approval:        soal[i].Approval,
 			CategoryId:      soal[i].CategoryID,
 		}
-		//fmt.Println(newArray)
+
 		mapArraySoal = append(mapArraySoal, newArray)
 
 	}
@@ -283,6 +268,4 @@ func ShowSubmittedQuestion(c echo.Context) error {
 		"message": "success",
 		"data":    mapArraySoal,
 	})
-
-	//------------------------------------------------
 }

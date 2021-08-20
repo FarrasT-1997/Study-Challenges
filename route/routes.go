@@ -43,7 +43,7 @@ func New(e *echo.Echo) {
 
 	//ADMIN FEATURE REVIEW SUBMITTED QUESTION FROM USER
 	eJwt.GET("/admin/submit_soal/:kategori_materi_pelajaran_id", controller.ShowSubmittedQuestion) //SHOW QUESTIONS ARE NOTE REVIEWED BY CATEGORY
-	eJwt.PUT("/admin/submit_soal/:id", controller.EditSubmitQuestion)                              //APPROVAL THE QUESTION (APPROVED OR REJECT)
+	eJwt.PUT("/admin/submit_soal/approval/:id", controller.EditSubmitQuestion)                     //APPROVAL THE QUESTION (APPROVED OR REJECT)
 
 	//USER FEATURE SUBMIT NEW QUESTION
 	eJwt.POST("users/submit_soal", controller.SubmitQuestion)
