@@ -192,7 +192,7 @@ func ShowSubmittedQuestion(c echo.Context) error {
 	//---------------------------------------------------------
 
 	var soal []models.Soal
-	if err := config.DB.Where(map[string]interface{}{"category_id": categoryId, "approval": "not_yet"}).Find(&soal).Error; err != nil {
+	if err := config.DB.Where(map[string]interface{}{"category_id": categoryId, "approval": "not yet"}).Find(&soal).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, "Cannot find the problem that needs approval")
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
