@@ -24,7 +24,7 @@ func UserSignup(c echo.Context) error {
 	}
 	mapUser := map[string]interface{}{
 		"ID":         user.ID,
-		"Name":       user.Nama,
+		"Nama":       user.Nama,
 		"Email":      user.Email,
 		"Total Poin": user.TotalPoin,
 		"Rank":       user.Rank,
@@ -47,12 +47,12 @@ func UserLogin(c echo.Context) error {
 	}
 	mapUserLogin := map[string]interface{}{
 		"ID":    user.ID,
-		"Name":  user.Nama,
+		"Nama":  user.Nama,
 		"Token": user.Token,
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Welcome",
-		"users":   mapUserLogin,
+		"data":    mapUserLogin,
 	})
 }
 
@@ -78,7 +78,7 @@ func ShowUserProfile(c echo.Context) error {
 		return err
 	}
 
-	user, err := database.GetDetailUser(userId)
+	user, err := database.GetOneUser(userId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "cannot find the user",

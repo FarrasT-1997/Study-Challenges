@@ -38,14 +38,6 @@ func GetOneUser(id int) (models.User, error) {
 	return user, nil
 }
 
-func GetDetailUser(id int) (models.User, error) {
-	var user models.User
-	if err := config.DB.Find(&user, id).Error; err != nil {
-		return user, err
-	}
-	return user, nil
-}
-
 func EditUser(user models.User) (models.User, error) {
 	if err := config.DB.Save(&user).Error; err != nil {
 		return user, err

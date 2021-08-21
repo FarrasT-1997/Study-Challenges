@@ -12,12 +12,6 @@ func CreateSetSoal(setSoal models.Set_soal) (models.Set_soal, error) {
 	return setSoal, nil
 }
 
-func LastQuestion() int {
-	var soal models.Soal
-	config.DB.Last(&soal)
-	return int(soal.ID)
-}
-
 func GetOneSoal(id int) models.Soal {
 	var soal models.Soal
 	config.DB.Find(&soal, "id=?", id)
