@@ -35,13 +35,6 @@ func GetOneQuestionById(soalId int) (models.Soal, error) {
 	return soal, nil
 }
 
-func EditStatusApproval(soal models.Soal) (interface{}, error) {
-	if err := config.DB.Save(&soal).Error; err != nil {
-		return nil, err
-	}
-	return soal, nil
-}
-
 func EditSoal(soal models.Soal) (models.Soal, error) {
 	if err := config.DB.Save(&soal).Error; err != nil {
 		return soal, err
