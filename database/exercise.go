@@ -95,7 +95,7 @@ func Scoring(setSoalId int) (int, []int) {
 	return totalScore, SoalId_salah
 }
 
-func UpdateUser(userId, totalScore int) {
+func UpdateUser(userId, totalScore int) models.User {
 	var user models.User
 	config.DB.Find(&user, "id=?", userId)
 	user.TotalPoin += totalScore
@@ -110,6 +110,7 @@ func UpdateUser(userId, totalScore int) {
 		user.Rank = "Gold"
 	}
 	config.DB.Save(&user)
+	return user
 }
 
 func GetSolution(setSoalId int) []models.Soal {

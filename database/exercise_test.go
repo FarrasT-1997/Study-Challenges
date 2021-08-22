@@ -3,6 +3,7 @@ package database
 import (
 	"SC/config"
 	"SC/models"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -81,6 +82,35 @@ var (
 		Status:       "not answered yet",
 		Poin:         0,
 		Jawaban_user: "pass",
+	}
+	mockSetSoalDetail3 = models.Set_soal_detail{
+		Set_soalID:   1,
+		SoalID:       1,
+		Status:       "not answered yet",
+		Poin:         0,
+		Jawaban_user: "pass",
+	}
+	mockSetSoalDetail4 = models.Set_soal_detail{
+		Set_soalID:   1,
+		SoalID:       2,
+		Status:       "not answered yet",
+		Poin:         0,
+		Jawaban_user: "pass",
+	}
+	mockSetSoalDetail5 = models.Set_soal_detail{
+		Set_soalID:   1,
+		SoalID:       1,
+		Status:       "not answered yet",
+		Poin:         0,
+		Jawaban_user: "pass",
+	}
+
+	mockJawaban = map[int]string{
+		1: "a",
+		2: "b",
+		3: "c",
+		4: "d",
+		5: "a",
 	}
 )
 
@@ -162,4 +192,106 @@ func TestShowActiveSoalSuccess(t *testing.T) {
 	activeSoalShowed := ShowActiveSoal(int(createdSetSoalDetail1.Set_soalID))
 	assert.Equal(t, createdSetSoalDetail1.SoalID, activeSoalShowed[0].ID)
 	assert.Equal(t, createdSetSoalDetail2.SoalID, activeSoalShowed[1].ID)
+}
+
+func TestPutAnswerSuccess(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.Set_soal_detail{})
+	config.DB.Migrator().AutoMigrate(&models.Set_soal_detail{})
+	InputSetSoalDetail(mockSetSoalDetail)
+	InputSetSoalDetail(mockSetSoalDetail2)
+	InputSetSoalDetail(mockSetSoalDetail3)
+	InputSetSoalDetail(mockSetSoalDetail4)
+	InputSetSoalDetail(mockSetSoalDetail5)
+	putAnswer := PutAnswer(1, mockJawaban)
+	fmt.Println(putAnswer)
+	assert.Equal(t, putAnswer[0].Jawaban_user, "a")
+	assert.Equal(t, putAnswer[1].Jawaban_user, "b")
+	assert.Equal(t, putAnswer[2].Jawaban_user, "c")
+	assert.Equal(t, putAnswer[3].Jawaban_user, "d")
+	assert.Equal(t, putAnswer[4].Jawaban_user, "a")
+}
+
+func TestUpdateUserSilverSuccess(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.User{})
+	config.DB.Migrator().AutoMigrate(&models.User{})
+	CreateUser(mockDBUser)
+	userUpdated := UpdateUser(1, 25)
+	fmt.Println(userUpdated)
+	assert.Equal(t, uint(1), userUpdated.ID)
+	assert.Equal(t, 25, userUpdated.TotalPoin)
+	assert.Equal(t, "Silver", userUpdated.Rank)
+}
+
+func TestUpdateUserBronzeSuccess(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.User{})
+	config.DB.Migrator().AutoMigrate(&models.User{})
+	CreateUser(mockDBUser)
+	userUpdated := UpdateUser(1, 10)
+	fmt.Println(userUpdated)
+	assert.Equal(t, uint(1), userUpdated.ID)
+	assert.Equal(t, 10, userUpdated.TotalPoin)
+	assert.Equal(t, "Bronze", userUpdated.Rank)
+}
+
+func TestUpdateUserGoldSuccess(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.User{})
+	config.DB.Migrator().AutoMigrate(&models.User{})
+	CreateUser(mockDBUser)
+	userUpdated := UpdateUser(1, 50)
+	fmt.Println(userUpdated)
+	assert.Equal(t, uint(1), userUpdated.ID)
+	assert.Equal(t, 50, userUpdated.TotalPoin)
+	assert.Equal(t, "Gold", userUpdated.Rank)
+}
+
+func TestGetSolutionSuccess(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.Set_soal_detail{})
+	config.DB.Migrator().AutoMigrate(&models.Set_soal_detail{})
+	config.DB.Migrator().DropTable(&models.Soal{})
+	config.DB.Migrator().AutoMigrate(&models.Soal{})
+	InputSetSoalDetail(mockSetSoalDetail)
+	InputSetSoalDetail(mockSetSoalDetail2)
+	InputSetSoalDetail(mockSetSoalDetail3)
+	InputSetSoalDetail(mockSetSoalDetail4)
+	InputSetSoalDetail(mockSetSoalDetail5)
+	CreateQuestion(mockSoal1)
+	CreateQuestion(mockSoal2)
+	CreateQuestion(mockSoal3)
+	CreateQuestion(mockSoal4)
+	solution := GetSolution(1)
+	assert.Equal(t, "WTOT = ΣF . s = (15 – 7,5) . 2 = 15 joule", solution[0].Solusi)
+	assert.Equal(t, "vt = v0 + at = 0 + (24 m/s2) (18 s). vt = 42 m/s", solution[1].Solusi)
+	assert.Equal(t, "Ketika 1 ditambah 1 maka hasilnya pasti 2", solution[2].Solusi)
+	assert.Equal(t, "Ketika 2 ditambah 2 maka hasilnya pasti 4", solution[3].Solusi)
+}
+
+func TestScoringSuccess(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.Set_soal_detail{})
+	config.DB.Migrator().AutoMigrate(&models.Set_soal_detail{})
+	config.DB.Migrator().DropTable(&models.Soal{})
+	config.DB.Migrator().AutoMigrate(&models.Soal{})
+	config.DB.Migrator().DropTable(&models.Set_soal{})
+	config.DB.Migrator().AutoMigrate(&models.Set_soal{})
+
+	InputSetSoalDetail(mockSetSoalDetail)
+	InputSetSoalDetail(mockSetSoalDetail2)
+	InputSetSoalDetail(mockSetSoalDetail3)
+	InputSetSoalDetail(mockSetSoalDetail4)
+	InputSetSoalDetail(mockSetSoalDetail5)
+
+	CreateQuestion(mockSoal1)
+	CreateQuestion(mockSoal2)
+	CreateQuestion(mockSoal3)
+	CreateQuestion(mockSoal4)
+
+	CreateSetSoal(mockSetSoal)
+	PutAnswer(1, mockJawaban)
+	scoringResult, _ := Scoring(1)
+	assert.Equal(t, 1, scoringResult)
 }
