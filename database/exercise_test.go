@@ -3,7 +3,6 @@ package database
 import (
 	"SC/config"
 	"SC/models"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -204,7 +203,6 @@ func TestPutAnswerSuccess(t *testing.T) {
 	InputSetSoalDetail(mockSetSoalDetail4)
 	InputSetSoalDetail(mockSetSoalDetail5)
 	putAnswer := PutAnswer(1, mockJawaban)
-	fmt.Println(putAnswer)
 	assert.Equal(t, putAnswer[0].Jawaban_user, "a")
 	assert.Equal(t, putAnswer[1].Jawaban_user, "b")
 	assert.Equal(t, putAnswer[2].Jawaban_user, "c")
@@ -218,7 +216,6 @@ func TestUpdateUserSilverSuccess(t *testing.T) {
 	config.DB.Migrator().AutoMigrate(&models.User{})
 	CreateUser(mockDBUser)
 	userUpdated := UpdateUser(1, 25)
-	fmt.Println(userUpdated)
 	assert.Equal(t, uint(1), userUpdated.ID)
 	assert.Equal(t, 25, userUpdated.TotalPoin)
 	assert.Equal(t, "Silver", userUpdated.Rank)
@@ -230,7 +227,6 @@ func TestUpdateUserBronzeSuccess(t *testing.T) {
 	config.DB.Migrator().AutoMigrate(&models.User{})
 	CreateUser(mockDBUser)
 	userUpdated := UpdateUser(1, 10)
-	fmt.Println(userUpdated)
 	assert.Equal(t, uint(1), userUpdated.ID)
 	assert.Equal(t, 10, userUpdated.TotalPoin)
 	assert.Equal(t, "Bronze", userUpdated.Rank)
@@ -242,7 +238,6 @@ func TestUpdateUserGoldSuccess(t *testing.T) {
 	config.DB.Migrator().AutoMigrate(&models.User{})
 	CreateUser(mockDBUser)
 	userUpdated := UpdateUser(1, 50)
-	fmt.Println(userUpdated)
 	assert.Equal(t, uint(1), userUpdated.ID)
 	assert.Equal(t, 50, userUpdated.TotalPoin)
 	assert.Equal(t, "Gold", userUpdated.Rank)
