@@ -8,10 +8,32 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo"
+	"golang.org/x/crypto/bcrypt"
 )
 
+func ourEncrypt(plain string) string {
+	bytePlain := []byte(plain)
+	hashed, _ := bcrypt.GenerateFromPassword(bytePlain, bcrypt.MinCost)
+	return string(hashed)
+}
+
 func UserSignup(c echo.Context) error {
+	input := models.User{}
+	c.Bind(&input)
+	if input.Nama == "" || input.Email == "" || input.Password == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "please fill name, email and password correctly",
+		})
+	}
+	if same, _ := database.CheckSameEmail(input.Email); same == true {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "email already used",
+		})
+	}
 	addUser := models.User{}
+	addUser.Nama = input.Nama
+	addUser.Email = input.Email
+	addUser.Password = ourEncrypt(input.Password)
 	addUser.TotalPoin = 0
 	addUser.Rank = "bronze"
 	addUser.Role = "user"
@@ -36,7 +58,12 @@ func UserSignup(c echo.Context) error {
 }
 
 func UserLogin(c echo.Context) error {
-	userData := models.User{}
+	input := models.User{}
+	c.Bind(&input)
+	userData := models.User{
+		Nama:     input.Email,
+		Password: ourEncrypt(input.Password),
+	}
 	c.Bind(&userData)
 
 	user, err := database.LoginUsers(userData.Email, userData.Password)
