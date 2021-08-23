@@ -96,7 +96,7 @@ func TestCheckEmailSuccessSameEmail(t *testing.T) {
 		assert.Equal(t, false, same)
 	}
 }
-func TestCheckEmailErrir(t *testing.T) {
+func TestCheckEmailError(t *testing.T) {
 	config.Init_DB_Test()
 	config.DB.Migrator().DropTable(&models.User{})
 	CreateUser(mockDBUser)
