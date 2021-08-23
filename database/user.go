@@ -6,6 +6,17 @@ import (
 	"SC/models"
 )
 
+func CheckSameEmail(email string) (bool, error) {
+	var user models.User
+	if err := config.DB.Raw("select * from users where email = ?", email).Scan(&user).Error; err != nil {
+		return true, err
+	}
+	if user.Email == email {
+		return true, nil
+	}
+	return false, nil
+}
+
 func CreateUser(user models.User) (models.User, error) {
 	if err := config.DB.Save(&user).Error; err != nil {
 		return user, err
