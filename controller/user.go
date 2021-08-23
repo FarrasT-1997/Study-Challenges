@@ -24,7 +24,7 @@ func UserSignup(c echo.Context) error {
 	}
 	mapUser := map[string]interface{}{
 		"ID":         user.ID,
-		"Nama":       user.Nama,
+		"Name":       user.Nama,
 		"Email":      user.Email,
 		"Total Poin": user.TotalPoin,
 		"Rank":       user.Rank,
@@ -47,12 +47,12 @@ func UserLogin(c echo.Context) error {
 	}
 	mapUserLogin := map[string]interface{}{
 		"ID":    user.ID,
-		"Nama":  user.Nama,
+		"Name":  user.Nama,
 		"Token": user.Token,
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Welcome",
-		"data":    mapUserLogin,
+		"users":   mapUserLogin,
 	})
 }
 
