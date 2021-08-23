@@ -147,20 +147,35 @@ func TestEditSoalError(t *testing.T) {
 }
 
 //TEST DeleteOneSoalSpecifiedId
-/*
+
 func TestDeleteOneSoalSpecifiedIdSuccess(t *testing.T) {
 	config.Init_DB_Test()
 	config.DB.Migrator().DropTable(&models.Soal{})
 	config.DB.Migrator().AutoMigrate(&models.Soal{})
+
+	var message string
+	var soal models.Soal
 	createdProblem, _ := CreateQuestion(mockDBSoal)
 	oneProblem, err := GetOneQuestionById(int(createdProblem.ID))
-	deletedProblem, err := DeleteOneSoalSpecifiedId(int(oneProblem.ID))
+	_, err = DeleteOneSoalSpecifiedId(int(oneProblem.ID))
+
+	if err := config.DB.Unscoped().Where("deleted_at IS NOT NULL").Find(&soal); err != nil {
+		message = "success"
+	} else {
+		message = "failed"
+	}
 
 	if assert.NoError(t, err) {
-		assert.Equal(t, "", )
+		assert.Equal(t, "success", message)
 	}
 }
-*/
+
+func TestDeleteOneSoalSpecifiedIdError(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.Soal{})
+	_, err := DeleteOneSoalSpecifiedId(1)
+	assert.Error(t, err)
+}
 
 //TEST GetAllSoalInSpecifiedCategory
 
