@@ -78,7 +78,7 @@ func ShowUserProfile(c echo.Context) error {
 		return err
 	}
 
-	user, err := database.GetDetailUser(userId)
+	user, err := database.GetOneUser(userId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"message": "cannot find the user",
