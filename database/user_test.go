@@ -83,6 +83,34 @@ func TestCreateUserError(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestCheckEmailSuccess(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.User{})
+	config.DB.Migrator().AutoMigrate(&models.User{})
+	CreateUser(mockDBUser)
+	same, err := CheckSameEmail("ryan@gmail.com")
+	if assert.NoError(t, err) {
+		assert.Equal(t, false, same)
+	}
+}
+func TestCheckEmailSuccessSameEmail(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.User{})
+	config.DB.Migrator().AutoMigrate(&models.User{})
+	CreateUser(mockDBUser)
+	same, err := CheckSameEmail("farras@gmail.com")
+	if assert.NoError(t, err) {
+		assert.Equal(t, false, same)
+	}
+}
+func TestCheckEmailError(t *testing.T) {
+	config.Init_DB_Test()
+	config.DB.Migrator().DropTable(&models.User{})
+	CreateUser(mockDBUser)
+	_, err := CheckSameEmail("farras@gmail.com")
+	assert.Error(t, err)
+}
+
 func TestLoginUserSuccess(t *testing.T) {
 	config.Init_DB_Test()
 	config.DB.Migrator().DropTable(&models.User{})

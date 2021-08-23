@@ -12,7 +12,22 @@ import (
 
 //post admin controller for admin signup
 func AdminSignup(c echo.Context) error {
+	input := models.User{}
+	c.Bind(&input)
+	if input.Nama == "" || input.Email == "" || input.Password == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "please fill name, email and password correctly",
+		})
+	}
+	if same, _ := database.CheckSameEmail(input.Email); same == true {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "email already used",
+		})
+	}
 	admin := models.User{}
+	admin.Nama = input.Nama
+	admin.Email = input.Email
+	admin.Password = ourEncrypt(input.Password)
 	admin.Role = "admin"
 	c.Bind(&admin)
 	adminAdd, err := database.CreateAdmin(admin)
@@ -94,7 +109,12 @@ func EditAdminProfile(c echo.Context) error {
 
 //Login for admin with matching email and password
 func AdminLogin(c echo.Context) error {
-	admin := models.User{}
+	input := models.User{}
+	c.Bind(&input)
+	admin := models.User{
+		Nama:     input.Email,
+		Password: ourEncrypt(input.Password),
+	}
 	c.Bind(&admin)
 	adminlogin, err := database.AdminLoginDB(admin.Email, admin.Password)
 	if err != nil {
