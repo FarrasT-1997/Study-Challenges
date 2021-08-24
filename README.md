@@ -3,21 +3,38 @@
 [![Go.Dev reference](https://img.shields.io/badge/echo-reference-blue?logo=go&logoColor=white)](https://github.com/labstack/echo)
 [![Go.Dev reference](https://img.shields.io/badge/gorm-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/gorm.io/gorm?tab=doc)
 
-_API permainan kuis untuk aplikasi Study Challenges_
+_API_ quiz game _untuk aplikasi Study Challenges_
 
 # Table of Content
 
 - [Introduction](#introduction)
+  - [Summary](#summary)
+  - [Subjects](#subjects)
 - [Features](#features)
 - [How to Use](#how-to-use)
-    - [API Documentation](#api-documentation)
+  - [Get Started]((#get-started))
+  - [API Documentation](#api-documentation)
 
+***
 # Introduction
-    Study Challenges adalah sebuah aplikasi berbasis kuis dalam bidang pendidikan, di dalam aplikasi ini seorang user dapat mengerjakan satu atau lebih set soal yang berisi 5 nomor. Satu set soal di ambil secara acak oleh sistem, namun materi pelajaran dan tingkat kesulitan dapat dipilih sesuai keinginan user.
+### **Summary**
+Study Challenges adalah sebuah aplikasi berbasis kuis dalam bidang pendidikan, di dalam aplikasi ini seorang user dapat mengerjakan satu atau lebih set soal yang berisi 5 nomor soal. Satu set soal di ambil secara acak oleh sistem, namun materi pelajaran dan tingkat kesulitan dapat dipilih sesuai keinginan user.
 
-    Untuk dapat mengakses fitur, user harus memiliki akun terlebih dahulu. Disini terdapat dua role untuk masing-masing user, antara lain : Admin dan User pengguna. Masing-masing role dapat menginisiasi soal, namun Admin memiliki wewenang khusus untuk memberikan ijin publish soal dari soal yang sudah user inisiasi sebelumnya, sehingga apabila Admin belum memberikan izin publish, maka soal dari user belum dapat di akses oleh pengguna lainnya.
+Untuk dapat mengakses fitur, user harus memiliki akun terlebih dahulu. Disini terdapat dua role untuk masing-masing user, antara lain : Admin dan User pengguna. Masing-masing role dapat menginisiasi soal, namun Admin memiliki wewenang khusus untuk memberikan ijin publish soal dari soal yang sudah user inisiasi sebelumnya, sehingga apabila Admin belum memberikan izin publish, maka soal dari user belum dapat di akses oleh pengguna lainnya.
 
-
+### **Subjects**
+Materi tantangan yang dapat di pilih oleh user antara lain :
+- Bidang Sains
+  - Biologi
+  - Fisika
+  - Kimia
+  - Matematika
+- Bidang Sosial
+  - Ekonomi
+  - Geografi
+  - Sejarah
+- Bahasa Inggris
+***
 # Features
 
 | No. | Features | Role | Keterangan |
@@ -32,6 +49,11 @@ _API permainan kuis untuk aplikasi Study Challenges_
 | 8. | Menginisiasi soal baru, dan langsung dapat di akses oleh setiap user. | Admin. | |
 | 9. | Menerima atau menolak inisiasi soal | Admin. | |
 
+***
+
 # How to Use
-## API Documentation
+## **Get Started**
+
+***
+## **API Documentation**
 Berikut merupakan Endpoint yang dapat dipergunakan untuk mengakses fitur dalam aplikasi Study Challenges : [klik disini](https://app.swaggerhub.com/apis/ryanpriatama/studychallanges/1#/ "Study-challenges-endpoint")
