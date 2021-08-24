@@ -1,6 +1,9 @@
 # STUDY CHALLENGES
+[![Go reference](https://pkg.go.dev/badge/golang.org/x/example.svg)](https://pkg.go.dev/golang.org/x/example)
+[![Go.Dev reference](https://img.shields.io/badge/echo-reference-blue?logo=go&logoColor=white)](https://github.com/labstack/echo)
+[![Go.Dev reference](https://img.shields.io/badge/gorm-reference-blue?logo=go&logoColor=white)](https://pkg.go.dev/gorm.io/gorm?tab=doc)
 
-_API_ quiz game _untuk aplikasi Study Challenges_
+_API permainan kuis untuk aplikasi Study Challenges_
 
 # Table of Content
 
@@ -13,12 +16,6 @@ _API_ quiz game _untuk aplikasi Study Challenges_
     Study Challenges adalah sebuah aplikasi berbasis kuis dalam bidang pendidikan, di dalam aplikasi ini seorang user dapat mengerjakan satu atau lebih set soal yang berisi 5 nomor. Satu set soal di ambil secara acak oleh sistem, namun materi pelajaran dan tingkat kesulitan dapat dipilih sesuai keinginan user.
 
     Untuk dapat mengakses fitur, user harus memiliki akun terlebih dahulu. Disini terdapat dua role untuk masing-masing user, antara lain : Admin dan User pengguna. Masing-masing role dapat menginisiasi soal, namun Admin memiliki wewenang khusus untuk memberikan ijin publish soal dari soal yang sudah user inisiasi sebelumnya, sehingga apabila Admin belum memberikan izin publish, maka soal dari user belum dapat di akses oleh pengguna lainnya.
-
-### Aplikasi ini di susun dengan menggunakan bahasa/Framework :
-- Golang.
-- Echo Framework.
-- Gorm
-- Mysql
 
 
 # Features
