@@ -31,7 +31,7 @@ func LoginUsers(email, password string) (models.User, error) {
 		return user, err
 	}
 
-	user.Token, err = auth.CreateToken(int(user.ID))
+	user.Token, err = auth.CreateSignedStringUser(int(user.ID))
 	if err != nil {
 		return user, err
 	}

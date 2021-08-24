@@ -16,23 +16,33 @@ func LogMiddlewares(e *echo.Echo) {
 	}))
 }
 
-func CreateToken(userId int) (string, error) {
+func CreateToken(userId int) (*jwt.Token, string) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["userId"] = int(userId)
+	claims["userId"] = float64(userId)
 	claims["role"] = "user"
 	claims["exp"] = time.Now().Add(time.Hour * 2).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	stringToken, _ := token.SignedString([]byte(constant.SECRET_JWT))
+	return token, stringToken
+}
+
+func CreateAdminToken(userId int) *jwt.Token {
+	claims := jwt.MapClaims{}
+	claims["authorized"] = true
+	claims["userId"] = float64(userId)
+	claims["role"] = "admin"
+	claims["exp"] = time.Now().Add(time.Hour * 2).Unix()
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+}
+
+func CreateSignedStringUser(userId int) (string, error) {
+	token, _ := CreateToken(userId)
 	return token.SignedString([]byte(constant.SECRET_JWT))
 }
 
-func CreateAdminToken(userId int) (string, error) {
-	claims := jwt.MapClaims{}
-	claims["authorized"] = true
-	claims["userId"] = int(userId)
-	claims["role"] = "admin"
-	claims["exp"] = time.Now().Add(time.Hour * 2).Unix()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+func CreateSignedStringAdmin(userId int) (string, error) {
+	token := CreateAdminToken(userId)
 	return token.SignedString([]byte(constant.SECRET_JWT))
 }
 
@@ -40,7 +50,6 @@ func ExtractTokenUserId(c echo.Context) (int, string) {
 	user := c.Get("user").(*jwt.Token)
 	if user.Valid {
 		claims := user.Claims.(jwt.MapClaims)
-		fmt.Println(claims)
 		userId := int(claims["userId"].(float64))
 		role := fmt.Sprintf("%v", claims["role"])
 		return userId, role
