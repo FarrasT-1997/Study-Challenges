@@ -40,9 +40,9 @@ func InitMigrate() {
 }
 
 func Init_DB_Test() {
-	connectionString := os.Getenv("CONNECTION_STRING_TEST")
+	// connectionString := os.Getenv("CONNECTION_STRING_TEST")
 	var err error
-	DB, err = gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+	DB, err = gorm.Open(mysql.Open("root:12345@tcp(localhost:3306)/study_test?charset=utf8&parseTime=True&loc=Local"), &gorm.Config{})
 	if err != nil {
 		panic(err.Error())
 	}
