@@ -12,26 +12,15 @@ func CreateSetSoal(setSoal models.Set_soal) (models.Set_soal, error) {
 	return setSoal, nil
 }
 
-func LastQuestion() int {
-	var soal models.Soal
-	config.DB.Last(&soal)
-	return int(soal.ID)
-}
-
-func GetOneSoal(id int) models.Soal {
-	var soal models.Soal
-	config.DB.Find(&soal, "id=?", id)
-	return soal
-}
-
 func RandomId(soalCategory_id, level uint) []models.Soal {
 	var soal []models.Soal
 	config.DB.Raw("SELECT id FROM soals WHERE kesulitan_id = ? AND category_id = ? AND approval = 'accept' ORDER BY rand() LIMIT 5", level, soalCategory_id).Scan(&soal)
 	return soal
 }
 
-func InputSetSoalDetail(setSoalDetail models.Set_soal_detail) {
+func InputSetSoalDetail(setSoalDetail models.Set_soal_detail) models.Set_soal_detail {
 	config.DB.Save(&setSoalDetail)
+	return setSoalDetail
 }
 
 func ShowSetSoal(set_soal_id int) models.Set_soal {
@@ -47,7 +36,7 @@ func ShowActiveSoal(setSoalId int) []models.Soal {
 	return soal
 }
 
-func PutAnswer(setSoalId int, jawabanUser map[int]string) {
+func PutAnswer(setSoalId int, jawabanUser map[int]string) []models.Set_soal_detail {
 	var soalDetail []models.Set_soal_detail
 	config.DB.Where("set_soal_id=?", setSoalId).Find(&soalDetail)
 	for i := 0; i < 5; i++ {
@@ -55,6 +44,7 @@ func PutAnswer(setSoalId int, jawabanUser map[int]string) {
 		soalDetail[i].Status = "answered"
 	}
 	config.DB.Save(&soalDetail)
+	return soalDetail
 }
 
 func Scoring(setSoalId int) (int, []int) {
@@ -105,7 +95,7 @@ func Scoring(setSoalId int) (int, []int) {
 	return totalScore, SoalId_salah
 }
 
-func UpdateUser(userId, totalScore int) {
+func UpdateUser(userId, totalScore int) models.User {
 	var user models.User
 	config.DB.Find(&user, "id=?", userId)
 	user.TotalPoin += totalScore
@@ -120,6 +110,7 @@ func UpdateUser(userId, totalScore int) {
 		user.Rank = "Gold"
 	}
 	config.DB.Save(&user)
+	return user
 }
 
 func GetSolution(setSoalId int) []models.Soal {

@@ -38,3 +38,12 @@ func InitMigrate() {
 	DB.AutoMigrate(&models.Soal{})
 	DB.AutoMigrate(&models.Category{})
 }
+
+func Init_DB_Test() {
+	connectionString := os.Getenv("CONNECTION_STRING_TEST")
+	var err error
+	DB, err = gorm.Open(mysql.Open(connectionString), &gorm.Config{})
+	if err != nil {
+		panic(err.Error())
+	}
+}

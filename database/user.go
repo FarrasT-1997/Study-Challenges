@@ -6,6 +6,17 @@ import (
 	"SC/models"
 )
 
+func CheckSameEmail(email string) (bool, error) {
+	var user models.User
+	if err := config.DB.Raw("select * from users where email = ?", email).Scan(&user).Error; err != nil {
+		return true, err
+	}
+	if user.Email == email {
+		return true, nil
+	}
+	return false, nil
+}
+
 func CreateUser(user models.User) (models.User, error) {
 	if err := config.DB.Save(&user).Error; err != nil {
 		return user, err
@@ -33,14 +44,6 @@ func LoginUsers(email, password string) (models.User, error) {
 func GetOneUser(id int) (models.User, error) {
 	var user models.User
 	if err := config.DB.Find(&user, "id=?", id).Error; err != nil {
-		return user, err
-	}
-	return user, nil
-}
-
-func GetDetailUser(id int) (models.User, error) {
-	var user models.User
-	if err := config.DB.Find(&user, id).Error; err != nil {
 		return user, err
 	}
 	return user, nil
