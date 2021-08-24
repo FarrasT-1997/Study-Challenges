@@ -20,9 +20,7 @@ jobs:
           fi
           cd /home/ubuntu/Study-Challenges
           git pull origin master
-          cd database
-          go test -cover
-          cd ..
+          go test -v ./...
           docker stop studychallenges-container
           docker rm studychallenges-container
           docker build -t sc-app:latest .
