@@ -4,15 +4,29 @@ import (
 	"SC/auth"
 	"SC/database"
 	"SC/models"
+	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo"
 	"golang.org/x/crypto/bcrypt"
 )
 
+var ctx = context.Background()
+
+func Redis() *redis.Client {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+	return client
+}
 func ourEncrypt(plain string) string {
 	bytePlain := []byte(plain)
 	hashed, _ := bcrypt.GenerateFromPassword(bytePlain, bcrypt.MinCost)
@@ -118,12 +132,25 @@ func ShowUserProfile(c echo.Context) error {
 	if err = UserAuthorize(userId, c); err != nil {
 		return err
 	}
+	cache := Redis()
+	key := fmt.Sprintf("userId%d", userId)
+	userCache, _ := cache.Get(ctx, key).Result()
 
-	user, err := database.GetOneUser(userId)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "cannot find the user",
-		})
+	var user models.User
+	if userCache == "" {
+		user, err = database.GetOneUser(userId)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "cannot find the user",
+			})
+		}
+		fmt.Print("Cache!!")
+		json, _ := json.Marshal(user)
+		cache.Set(ctx, key, json, time.Minute)
+
+	}
+	if userCache != "" {
+		json.Unmarshal([]byte(userCache), &user)
 	}
 	quote, author := Quote()
 	mapUser := map[string]interface{}{
@@ -185,6 +212,13 @@ func EditUserProfile(c echo.Context) error {
 			"message": "cannot edit data",
 		})
 	}
+
+	//Cache
+	cache := Redis()
+	key := fmt.Sprintf("userId%d", id)
+	json, _ := json.Marshal(user)
+	cache.Set(ctx, key, json, time.Minute)
+
 	mapUser := map[string]interface{}{
 		"ID":         user.ID,
 		"Name":       user.Nama,
