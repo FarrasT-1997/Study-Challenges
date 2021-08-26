@@ -4,13 +4,29 @@ import (
 	"SC/auth"
 	"SC/database"
 	"SC/models"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo"
 	"golang.org/x/crypto/bcrypt"
 )
 
+var ctx = context.Background()
+
+func Redis() *redis.Client {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "172.17.0.1:6379",
+		Password: "",
+		DB:       0,
+	})
+	return client
+}
 func ourEncrypt(plain string) string {
 	bytePlain := []byte(plain)
 	hashed, _ := bcrypt.GenerateFromPassword(bytePlain, bcrypt.MinCost)
@@ -92,7 +108,19 @@ func UserAuthorize(userId int, c echo.Context) error {
 	}
 	return nil
 }
+func Quote() (string, string) {
+	type Response struct {
+		Q string
+		A string
+		H string
+	}
+	response, _ := http.Get("https://zenquotes.io/api/random")
+	responseData, _ := ioutil.ReadAll(response.Body)
 
+	var responseObject []Response
+	json.Unmarshal(responseData, &responseObject)
+	return responseObject[0].Q, responseObject[0].A
+}
 func ShowUserProfile(c echo.Context) error {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -104,19 +132,35 @@ func ShowUserProfile(c echo.Context) error {
 	if err = UserAuthorize(userId, c); err != nil {
 		return err
 	}
+	cache := Redis()
+	key := fmt.Sprintf("userId%d", userId)
+	userCache, _ := cache.Get(ctx, key).Result()
 
-	user, err := database.GetOneUser(userId)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "cannot find the user",
-		})
+	var user models.User
+	if userCache == "" {
+		user, err = database.GetOneUser(userId)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "cannot find the user",
+			})
+		}
+		fmt.Print("Cache!!")
+		json, _ := json.Marshal(user)
+		cache.Set(ctx, key, json, time.Minute)
+
 	}
+	if userCache != "" {
+		json.Unmarshal([]byte(userCache), &user)
+	}
+	quote, author := Quote()
 	mapUser := map[string]interface{}{
-		"ID":         user.ID,
-		"Name":       user.Nama,
-		"Email":      user.Email,
-		"Total Poin": user.TotalPoin,
-		"Rank":       user.Rank,
+		"ID":                  user.ID,
+		"Name":                user.Nama,
+		"Email":               user.Email,
+		"Total Poin":          user.TotalPoin,
+		"Rank":                user.Rank,
+		"Random_Quote":        quote,
+		"Random_Quote_Author": author,
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success",
@@ -168,6 +212,13 @@ func EditUserProfile(c echo.Context) error {
 			"message": "cannot edit data",
 		})
 	}
+
+	//Cache
+	cache := Redis()
+	key := fmt.Sprintf("userId%d", id)
+	json, _ := json.Marshal(user)
+	cache.Set(ctx, key, json, time.Minute)
+
 	mapUser := map[string]interface{}{
 		"ID":         user.ID,
 		"Name":       user.Nama,

@@ -3,8 +3,11 @@ package controller
 import (
 	"SC/database"
 	"SC/models"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -184,7 +187,13 @@ func AnswerQuestion(c echo.Context) error {
 	database.PutAnswer(setSoalId, jawabanUserMap)
 	totalScore, SoalId_salah := database.Scoring(setSoalId)
 
-	database.UpdateUser(userId, totalScore)
+	userUpdated := database.UpdateUser(userId, totalScore)
+
+	//Cache
+	cache := Redis()
+	key := fmt.Sprintf("userId%d", userId)
+	json, _ := json.Marshal(userUpdated)
+	cache.Set(ctx, key, json, time.Minute)
 
 	mapResult := map[string]interface{}{
 		"Total Score": totalScore,

@@ -4,8 +4,11 @@ import (
 	"SC/auth"
 	"SC/database"
 	"SC/models"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -58,11 +61,25 @@ func ShowAdminProfile(c echo.Context) error {
 	if err = AdminAuthorize(id, c); err != nil {
 		return err
 	}
-	admin, err := database.GetAdminid(id)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"message": "cannot find the admin",
-		})
+
+	cache := Redis()
+	key := fmt.Sprintf("adminId%d", id)
+	adminCache, _ := cache.Get(ctx, key).Result()
+	var admin models.User
+
+	if adminCache == "" {
+		admin, err = database.GetAdminid(id)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"message": "cannot find the admin",
+			})
+		}
+		fmt.Print("Cache!!")
+		json, _ := json.Marshal(admin)
+		cache.Set(ctx, key, json, time.Minute)
+	}
+	if adminCache != "" {
+		json.Unmarshal([]byte(adminCache), &admin)
 	}
 	mapAdmin := map[string]interface{}{
 		"ID":    admin.ID,
@@ -95,6 +112,13 @@ func EditAdminProfile(c echo.Context) error {
 			"message": "cannot edit data",
 		})
 	}
+
+	//Cache
+	cache := Redis()
+	key := fmt.Sprintf("adminId%d", id)
+	json, _ := json.Marshal(adminUpdate)
+	cache.Set(ctx, key, json, time.Minute)
+
 	mapAdmin := map[string]interface{}{
 		"ID":    adminUpdate.ID,
 		"Name":  adminUpdate.Nama,
