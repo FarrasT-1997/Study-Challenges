@@ -43,7 +43,7 @@ Materi tantangan yang dapat di pilih oleh user antara lain :
 | 3. | Memilih dan mengerjakan Set Soal random berdasarkan kategori dan tingkat kesulitan. | User. | Satu set berisi 5 nomor soal. |
 | 4. | Melihat perolehan poin dari pengerjaan set soal. | User. | |
 | 5. | Memiliki Badge yang diperoleh dari kalkulasi poin keseluruhan. | User. | Badge antara lain : Bronze, Silver, dan Gold. |
-| 6. | Melihat Leaderboard. | User, Admin. | Ranking 1 s.d 10 |
+| 6. | Melihat Leaderboard. | User. | Ranking 1 s.d 10 |
 | 7. | Menginisiasi soal baru, lalu dapat di akses hanya jika Admin mengizinkan _publish_. | User. | Admin dapat meng-_accept_/ me-_reject_ status soal. |
 | 8. | Menginisiasi soal baru, dan langsung dapat di akses oleh setiap user. | Admin. | |
 | 9. | Menerima atau menolak inisiasi soal | Admin. | |
@@ -69,6 +69,7 @@ example :
 | nama | my name |
 | email | myname@myemail.com |
 | password | mysecret |
+
 Kita dapat mengirimkan informasi yang sudah dilengkapi sebelumnya dengan menekan tombol `send`. Jika muncul pesan seperti berikut: 
 ```json
 {
@@ -122,6 +123,7 @@ pada contoh diatas, user dengan id 4 ingin membuat sebuah set soal baru. Selanju
 | --- | --- |
 | CategoryID | 5 |
 | KesulitanID | 2 |
+
 dari format di atas, maka terlihat user memilih pelajaran Bahasa Inggris dengan tingkat kesulitan 2.
 Sistem akan bekerja untuk menyusun set soal, apabila proses tersebut berhasil, akan muncul pesan dengan format berikut:
 ```json
