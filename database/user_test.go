@@ -100,7 +100,7 @@ func TestCheckEmailSuccessSameEmail(t *testing.T) {
 	CreateUser(mockDBUser)
 	same, err := CheckSameEmail("farras@gmail.com")
 	if assert.NoError(t, err) {
-		assert.Equal(t, false, same)
+		assert.Equal(t, true, same)
 	}
 }
 func TestCheckEmailError(t *testing.T) {
