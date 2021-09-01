@@ -7,7 +7,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
@@ -108,19 +107,21 @@ func UserAuthorize(userId int, c echo.Context) error {
 	}
 	return nil
 }
-func Quote() (string, string) {
-	type Response struct {
-		Q string
-		A string
-		H string
-	}
-	response, _ := http.Get("https://zenquotes.io/api/random")
-	responseData, _ := ioutil.ReadAll(response.Body)
 
-	var responseObject []Response
-	json.Unmarshal(responseData, &responseObject)
-	return responseObject[0].Q, responseObject[0].A
-}
+// func Quote() (string, string) {
+// 	type Response struct {
+// 		Q string
+// 		A string
+// 		H string
+// 	}
+// 	response, _ := http.Get("https://zenquotes.io/api/random")
+// 	responseData, _ := ioutil.ReadAll(response.Body)
+
+// 	var responseObject []Response
+// 	json.Unmarshal(responseData, &responseObject)
+// 	return responseObject[0].Q, responseObject[0].A
+// }
+
 func ShowUserProfile(c echo.Context) error {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -152,15 +153,15 @@ func ShowUserProfile(c echo.Context) error {
 	if userCache != "" {
 		json.Unmarshal([]byte(userCache), &user)
 	}
-	quote, author := Quote()
+	// quote, author := Quote()
 	mapUser := map[string]interface{}{
-		"ID":                  user.ID,
-		"Name":                user.Nama,
-		"Email":               user.Email,
-		"Total Poin":          user.TotalPoin,
-		"Rank":                user.Rank,
-		"Random_Quote":        quote,
-		"Random_Quote_Author": author,
+		"ID":         user.ID,
+		"Name":       user.Nama,
+		"Email":      user.Email,
+		"Total Poin": user.TotalPoin,
+		"Rank":       user.Rank,
+		// "Random_Quote":        quote,
+		// "Random_Quote_Author": author,
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success",
